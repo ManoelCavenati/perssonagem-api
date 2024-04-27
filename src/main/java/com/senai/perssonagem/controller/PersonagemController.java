@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,7 @@ import com.senai.perssonagem.service.PersonagemService;
 // O package Controller para guardar as classes que representem esses controladores, essa faxada http na aplicação
 // @RestController: Esta anotação faz com que o Spring boot saiba que essa classe irá trabalhar com http e dados em json.
 @RestController
-@RequestMapping(name = "personagens") // Significa /o quê a aplicação vai responder nessa classe
+@RequestMapping("personagens") // Significa /o quê a aplicação vai responder nessa classe
 public class PersonagemController {
 
     @Autowired // Autowired é reponsável por pegar a instancia service e injetar esse objeto
@@ -45,6 +46,12 @@ public class PersonagemController {
     public ResponseEntity<Personagem> criar(@RequestBody Personagem personagem) {
         personagem = service.inserir(personagem);
         return ResponseEntity.created(URI.create(personagem.getId().toString())).body(personagem);
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> excluir(@PathVariable Integer id) {
+        service.excluir(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

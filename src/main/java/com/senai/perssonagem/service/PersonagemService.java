@@ -1,5 +1,6 @@
 package com.senai.perssonagem.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class PersonagemService {
     }
 
     public Personagem inserir(Personagem personagem) {
+        personagem.setDataCadastro(LocalDate.now());
         personagem = repository.save(personagem);
         return personagem;
 
@@ -40,6 +42,13 @@ public class PersonagemService {
 
         return repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Personagem não encontrado com o id " + id));
+    }
+
+    public void excluir(Integer id) {
+        boolean existe = repository.existsById(id);
+        if (!existe)
+            throw new IllegalArgumentException("Personagem não encontrado com i id " + id);
+        repository.deleteById(id);
     }
 
 }
