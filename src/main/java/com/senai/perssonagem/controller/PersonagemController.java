@@ -1,6 +1,7 @@
 package com.senai.perssonagem.controller;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.senai.perssonagem.model.Personagem;
@@ -27,12 +29,21 @@ public class PersonagemController {
     private PersonagemService service;
 
     // ResponseEntity: É a classe do Spring que emcapsula uma reposta http
-    @GetMapping // GetMapping é o verbo http de consulta no banco de dados no Spring
-    public ResponseEntity<List<Personagem>> listar() {
-        var personagens = service.consultar(); // Esse service.consultar irá me voltar uma lista de personagens: var
-                                               // personagens
-        return ResponseEntity.ok().body(personagens); // Irá retornar .ok mensagem 200 e serelializar para json no
-                                                      // corpo.
+    @GetMapping
+    public ResponseEntity<List<Personagem>> listar(
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String referencia) {
+        List<Personagem> personagens = new ArrayList<>();
+        if (nome == null && referencia == null) {
+            personagens = service.consultar();
+        } else if (nome != null && referencia == null) {
+            Personagem personagem = service.consultarPorNome(nome);
+            personagens.add(personagem);
+        } else {
+            Personagem personagem = service.consultarPor(nome, referencia);
+            personagens.add(personagem);
+        }
+        return ResponseEntity.ok().body(personagens);
     }
 
     @GetMapping("{id}")

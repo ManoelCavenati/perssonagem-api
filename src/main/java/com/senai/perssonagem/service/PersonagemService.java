@@ -2,6 +2,8 @@ package com.senai.perssonagem.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,10 @@ public class PersonagemService {
     }
 
     public Personagem inserir(Personagem personagem) {
+        // Regra de Negócio: não deve haver mais de um personagem com o mesmo nome.
+        boolean existeComNome = repository.existsByNome(personagem.getNome());
+        if (existeComNome)
+            throw new IllegalArgumentException("Nome já registrado!!");
         personagem.setDataCadastro(LocalDate.now());
         personagem = repository.save(personagem);
         return personagem;
@@ -47,8 +53,21 @@ public class PersonagemService {
     public void excluir(Integer id) {
         boolean existe = repository.existsById(id);
         if (!existe)
-            throw new IllegalArgumentException("Personagem não encontrado com i id " + id);
+            throw new IllegalArgumentException("Personagem não encontrado com o id " + id);
         repository.deleteById(id);
+    }
+
+    public Personagem consultarPorNome(String nome) {
+        Optional<Personagem> personagemOpt = repository.findByNome(nome);
+        if (personagemOpt.isEmpty())
+            throw new IllegalArgumentException("Personagem não encontrado com o nome " + nome);
+        return personagemOpt.get();
+
+    }
+
+    public Personagem consultarPor(String nome, String referencia) {
+        Optional<Personagem> personagemOpt = repository.obterPorNomeEreferencia2(nome, referencia);
+        return personagemOpt.orElseThrow(() -> new IllegalArgumentException("Registro não encontrado"));
     }
 
 }
